@@ -39,16 +39,6 @@ class AnalizadorLexico():
             self.columna += 1
             self.estado = 2
 
-
-        elif caracter =="[":
-            self.lexema += caracter
-            self.columna += 1
-            self.estado = 4
-
-        elif caracter == "]":
-            self.lexema += caracter
-            self.columna += 1
-            self.estado = 4
         elif caracter == "<":
             self.lexema += caracter
             self.columna += 1
@@ -59,41 +49,30 @@ class AnalizadorLexico():
             self.columna += 1
             self.estado = 4
         
-        elif caracter =="{":
-            self.lexema += caracter
-            self.columna += 1
-            self.estado = 4
-
-
-        elif caracter =="}":
-            self.lexema += caracter
-            self.columna += 1
-            self.estado = 4
-
-        elif caracter ==",":
-            self.lexema += caracter
-            self.columna += 1
-            self.estado = 4
+        # elif caracter ==",":
+        #     self.lexema += caracter
+        #     self.columna += 1
+        #     self.estado = 4
         
         elif caracter =="'" or caracter == '"':
             self.lexema += caracter
             self.columna +=1
             self.estado = 3
         
-        elif caracter ==":":
-            self.lexema += caracter
-            self.columna +=1
-            self.estado = 4
+        # elif caracter ==":":
+        #     self.lexema += caracter
+        #     self.columna +=1
+        #     self.estado = 4
         
-        elif caracter == "#":
-            self.lexema += caracter
-            self.columna += 1
-            self.estado = 4
+        # elif caracter == "#":
+        #     self.lexema += caracter
+        #     self.columna += 1
+        #     self.estado = 4
 
-        elif  caracter == ";":
-            self.lexema += caracter
-            self.columna+=1
-            self.estado = 4
+        # elif  caracter == ";":
+        #     self.lexema += caracter
+        #     self.columna+=1
+        #     self.estado = 4
         
         elif caracter == "\t":
             self.columna +=1
@@ -122,6 +101,7 @@ class AnalizadorLexico():
     
     #!===========================================================
     #? Estados para ingreso de cadenas, indicadores y reservadas, excepciones de cadenas
+    #* Verificado completo
     def Estado1(self, caracter :str):
         '''Estado q1'''
 
