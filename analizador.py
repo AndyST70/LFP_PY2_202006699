@@ -34,46 +34,38 @@ class AnalizadorLexico():
             self.columna +=1
             self.estado = 2
 
-        elif caracter ==".":
+        elif caracter =="-":
             self.lexema += caracter
             self.columna += 1
-            self.estado = 2
-
-        elif caracter == "<":
-            self.lexema += caracter
-            self.columna += 1
-            self.estado = 4
-
-        elif caracter == ">":
-            self.lexema += caracter
-            self.columna += 1
-            self.estado = 4
-        
-        # elif caracter ==",":
-        #     self.lexema += caracter
-        #     self.columna += 1
-        #     self.estado = 4
+            self.estado = 6
         
         elif caracter =="'" or caracter == '"':
             self.lexema += caracter
             self.columna +=1
-            self.estado = 3
-        
-        # elif caracter ==":":
-        #     self.lexema += caracter
-        #     self.columna +=1
-        #     self.estado = 4
-        
-        # elif caracter == "#":
-        #     self.lexema += caracter
-        #     self.columna += 1
-        #     self.estado = 4
+            self.estado = 8    
+#! --->=============
+        elif caracter == "<":
+            self.lexema += caracter
+            self.columna += 1
+            self.estado = 10
 
-        # elif  caracter == ";":
-        #     self.lexema += caracter
-        #     self.columna+=1
-        #     self.estado = 4
-        
+        elif caracter == ">":
+            self.lexema += caracter
+            self.columna += 1
+            self.estado = 10
+        elif caracter == "[":
+            self.lexema += caracter
+            self.columna += 1
+            self.estado = 10
+        elif caracter == "]":
+            self.lexema += caracter
+            self.columna += 1
+            self.estado = 10
+        elif caracter == "-":
+            self.lexema += caracter
+            self.columna += 1
+            self.estado = 10
+
         elif caracter == "\t":
             self.columna +=1
 
@@ -103,7 +95,7 @@ class AnalizadorLexico():
     #? Estados para ingreso de cadenas, indicadores y reservadas, excepciones de cadenas
     #* Verificado completo
     def Estado1(self, caracter :str):
-        '''Estado q1'''
+        '''Estado s1'''
 
         if caracter.isalpha(): # tipo
             self.lexema += caracter 
@@ -125,8 +117,8 @@ class AnalizadorLexico():
                 #? Asignamos nuestras palabras reservadas
                 #? formulario, tipo, valor, fondo, nombre
                 #? valores, evento
-            if self.lexema == "formulario" :
-                self.agregar_token(self.lexema, "palabra reservada", self.linea, self.columna)                 
+            if self.lexema == "JORNADA" or self.lexema == "GOLES" or self.lexema == "TABLA" or self.lexema == "TEMPORADA" or self.lexema == "PARTIDOS" or self.lexema == "TOP" or self.lexema == "ADIOS" or self.lexema == "VS" or self.lexema == "TOTAL" or self.lexema == "LOCAL" or self.lexema == "VISITANTE":
+                self.agregar_token(self.lexema, "palabra reservada", self.linea, self.columna)
                 self.estado = 0
                 self.i -= 1
         #!======================================================
@@ -135,7 +127,7 @@ class AnalizadorLexico():
             #     self.estado = 0
             #     self.i -= 1
             
-            elif self.lexema == "tipo" or self.lexema == "valor" or self.lexema == "fondo" or self.lexema == "nombre" or self.lexema == "valores" or self.lexema == "evento":
+            elif self.lexema == "archivo" :
                 self.agregar_token(self.lexema, "Identificador", self.linea, self.columna)
                 self.estado = 0
                 self.i -= 1
@@ -152,25 +144,92 @@ class AnalizadorLexico():
     #? Estados de digitos enteros
     def Estado2(self, caracter :str):
     #!===========================================================    
-        '''Estado q2'''
-    
+        '''Estado s2'''
         if caracter.isdigit():
             self.lexema +=caracter
             self.columna += 1
-            self.estado = 2
-               
-        elif caracter == ".":
-            self.lexema += caracter
-            self.columna +=1
-            self.estado = 5
+            self.estado = 3
+        else:
+            self.agregar_token(self.lexema, "Numero: se ingreso un número", self.linea, self.columna)
+            self.estado = 0
+            self.i -= 1
+    
+    #!===========================================================
+    #? Estados de digitos enteros
+    def Estado3 (self, caracter : str):
+    #!===========================================================    
+        '''Estado s3'''
+        if caracter.isdigit():
+            self.lexema +=caracter
+            self.columna += 1
+            self.estado = 4
         else: 
             self.agregar_token(self.lexema, "Numero: se ingreso un número", self.linea, self.columna)
             self.estado = 0
             self.i -= 1
     
     #!===========================================================
+    #? Estados de digitos enteros
+    def Estado4 (self, caracter : str):
+    #!===========================================================    
+    
+        '''Estado s4'''
+        if caracter.isdigit():
+            self.lexema +=caracter
+            self.columna += 1
+            self.estado = 5
+        else: 
+            self.lexema += caracter
+              #! nos dara un error
+            self.ListaErrores.append(Error(self.lexema, 
+            self.linea,
+            self.columna,
+            "Error Caracter desconocido"
+            )) 
+
+    #!===========================================================
+    #? Estados de digitos enteros
+    def Estado5 (self, caracter : str):
+    #!===========================================================   
+        '''Estado s5'''
+        if caracter.isdigit():
+            self.lexema +=caracter
+            self.columna += 1
+            self.estado = 5
+        else:
+            self.agregar_token(self.lexema, "Digito: Se ingreso un año", self.linea, self.columna)
+            self.estado = 0
+            self.i -= 1
+    #!=========================================================== 
+    def Estado6 (self, caracter : str):
+    #!===========================================================   
+        '''Estado s6'''
+        if caracter == "jf" or caracter == "ji" or caracter == "f" or caracter == "n":
+            self.lexema +=caracter
+            self.columna += 1
+            self.estado = 7
+        else:
+            self.agregar_token(self.lexema, "Simbolo: signo (-)", self.linea, self.columna)
+            self.estado = 0
+            self.columna += 1
+            self.i -= 1 
+    #!=========================================================== 
+    def Estado7 (self, caracter : str):
+        '''Estado s7'''
+    #!=========================================================== 
+        if caracter == "-jf" or caracter == "-ji" or caracter == "-f" or caracter == "-n":
+            self.lexema +=caracter
+            self.columna += 1
+        else:
+            self.agregar_token(self.lexema, "palabra reservada", self.linea, self.columna)
+            self.columna+=1
+            self.estado = 0
+            self.i -= 1        
+
+#TODO CADENA NO TOCAR
+    #!===========================================================
     #? Estado para creación de cadenas
-    def Estado3(self, caracter : str):
+    def Estado8 (self, caracter : str):
         if caracter.isalpha() or caracter == "-" or caracter == " ":
             self.lexema += caracter
             self.columna +=1
@@ -179,18 +238,13 @@ class AnalizadorLexico():
             self.lexema +=caracter
             self.columna += 1    
             self.estado = 3
-        #elif caracter == "_" or caracter == " ":
-        #    self.estado = 1
-        #     self.lexema +=caracter
-        #     self.columna += 1   
         else: 
             caracter == "'" or caracter == '"'
             self.estado = 7 
             self.lexema +=caracter
             self.columna += 1
-            
-   
-    def Estado7(self, caracter: str):
+
+    def Estado9(self, caracter: str):
         if caracter == '"' or caracter == "'":
             self.estado = 7
             self.lexema += caracter
@@ -200,44 +254,27 @@ class AnalizadorLexico():
             self.i -= 1
     #!===========================================================
     #? Estado para creación de simbolos
-    def Estado4 (self, caracter : str):
+    def Estado10 (self, caracter : str):
         '''estado q4'''
-        if caracter == "[" or caracter == "]" or caracter == "<" or caracter == ">" or caracter == "{" or caracter == "}" or caracter == "," or caracter == ":" or caracter == "#" or caracter == ";": 
+        if caracter == "[" or caracter == "]" or caracter == "<" or caracter == ">" or caracter == "-" : 
             self.lexema += caracter
             self.columna +=1
-            self.estado = 4
-        
+            self.estado = 4        
         else:
-            self.agregar_token(self.lexema, "Simbolo", self.linea, self.columna)
+            if self.lexema == "[":
+                self.agregar_token(self.lexema, "Simbolo [", self.linea, self.columna)
+            elif self.lexema == "]":
+                self.agregar_toke<(self.lexema, "Simbolo ]", self.linea, self.columna)
+            elif self.lexema == "<":
+                self.agregar_token(self.lexema, "Simbolo menor <", self.linea, self.columna)
+            elif self.lexema == ">":
+                self.agregar_token(self.lexema, "Simbolo mayor <", self.linea, self.columna)
+            elif self.lexema == "-":
+                self.agregar_token(self.lexema, "Simbolo guion -", self.linea, self.columna)
             self.estado = 0
             self.columna += 1
-            self.i -= 1
-        
-    
-    #!===========================================================
-    #? Estado para creación de decimales
-    def Estado5(self, caracter : str):
-
-        '''Estado q5'''    
-        if caracter.isdigit():
-            self.lexema +=caracter
-            self.columna += 1
-            self.estado = 6
-        else: 
-            pass
-    
-    #!===========================================================
-    #? Estados para creación de decimales
-    def Estado6(self, caracter: str):
-        '''estado q6'''
-        if  caracter.isdigit():
-            self.lexema +=caracter
-            self.columna += 1
-            self.estado = 6            
-        else:
-            self.agregar_token(self.lexema, "Numero: se ingreso seguido de un decimal", self.linea, self.columna)
-            self.estado = 0
-            self.i -= 1
+            self.i -= 1    
+  
     #!===========================================================
     #? Estados para creación de decimales
 
@@ -261,7 +298,13 @@ class AnalizadorLexico():
             elif self.estado == 6:
                 self.Estado6(caracter[self.i])
             elif self.estado == 7:
-                self.Estado7(caracter[self.i])
+                self.Estado8(caracter[self.i])
+            elif self.estado == 8:
+                self.Estado9(caracter[self.i])
+            elif self.estado == 9:
+                self.Estado9(caracter[self.i])
+            elif self.estado == 10:
+                self.Estado10(caracter[self.i])
             self.i += 1
 
     def imprimirTokens(self):
