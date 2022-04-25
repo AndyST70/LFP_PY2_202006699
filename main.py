@@ -48,21 +48,22 @@ def ventana_creacion():
     #!==================================================================================================================
     #? Manuales de PDF 
     global boton_ManualUsuario
-    boton_ManualUsuario = Button(ventana, text = "Manual de usuario", command = enter_entrada,   width = "20", height="1", bg = "#FFFFCC")
+    boton_ManualUsuario = Button(ventana, text = "Manual de usuario", width = "20", height="1", bg = "#FFFFCC")
     boton_ManualUsuario.place(x=490, y =190)
     
     global boton_ManualTecnico
-    boton_ManualTecnico = Button(ventana, text = "Manual Técnico",command = enter_entrada, width = "20", height="1", bg = "#FFFFCC")
+    boton_ManualTecnico = Button(ventana, text = "Manual Técnico", width = "20", height="1", bg = "#FFFFCC")
     boton_ManualTecnico.place(x=490, y =220)
     
     
-    boton_enviar = Button(ventana, text = "enviar", width = "15", height="1", bg = "#FFFFCC"  )
+    boton_enviar = Button(ventana, text = "enviar", width = "15", command= analizar,  height="1", bg = "#FFFFCC"  )
     boton_enviar.place(x=490, y =500)
     
     global caja_texto
     caja_texto = ScrolledText(ventana, width = "50", height= "25")
+    
     caja_texto.place(x=40, y = 60)
-
+    global entry
     # Crear caja de texto.
     entry = ttk.Entry(width=70)
     # Posicionarla en la ventana.
@@ -70,11 +71,19 @@ def ventana_creacion():
 
     entrada.pack()
     ventana.mainloop()
+#? limpieza
 def analizar():
    #!traemos nuestros datos para manipulación y realización de tablas 
-   a = caja_texto.get("1.0", tk.END)
-   lexico.iniciar() #! reseteamos nuestras listas 
-   lexico.Analizar(a) #? iniciamos nuestros tokens y la formulación de estos
+    a = entry.get() + " "#("1.0", tk.END
+    # print(len(lexico.ListaTokens))
+    #! reseteamos nuestras listas 
+    lexico.Analizar(a) #? iniciamos nuestros tokens y la formulación de estos
+def tokens():
+    lexico.imprimirTokens()
+def errores():
+    lexico.imprimirErrores()
+
+
 def salir():
     sys.exit()
 def abrir():
@@ -100,41 +109,22 @@ def abrir():
         caja_texto.delete("1.0", "end")
         caja_texto.insert(INSERT, texto)
         return texto #retorna nuestro texto
+#!rutas dinamicas
 def rutars(entrada):
     ruta_datos = uso_.path.dirname(uso_.path.abspath(__file__))+ "\\archivos\{}".format(entrada)
     webbrowser.open_new(ruta_datos)
-    
     print(ruta_datos)
 
+def imprimir(entrada):
+    
+    pass
 
-def enter_entrada():
-    #!==================================================
-    if boton_ManualTecnico.get() == "Reporte de Tokens":
-        boton_ManualTecnico.set("")
-        if lexico.ListaTokens != None:
-           lexico.imprimirTokens()
-        else: 
-            print("No tenemos información")
 
-    elif combo.get() == "Reporte de errores":
-        combo.set("")
-        if lexico.ListaErrores != None:
-            lexico.imprimirErrores()
-        else: 
-            print("No tenemos información")
-    elif boton_ManualUsuario.get() == "Manual Usuario":
-        boton_ManualUsuario.set("")
-        rutars("Manual Usuario.pdf")
-
-    elif boton_ManualTecnico.get() == "Manual Tecnico":
-        boton_ManualTecnico.set("")
-        rutars("Manual Tecnico.pdf")
-                    
     # #? creacion de mensajes
 if __name__ == '__main__':
     ventana_creacion()
     lexico.Tabla_tokens()
-    print(len(lexico.ListaTokens))
+   
     print(len(lexico.ListaErrores))
 
 

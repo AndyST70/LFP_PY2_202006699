@@ -38,11 +38,12 @@ class AnalizadorLexico():
             self.lexema += caracter
             self.columna += 1
             self.estado = 6
-        
-        elif caracter =="'" or caracter == '"':
+#! --->=============        
+        elif caracter == '"':
             self.lexema += caracter
+
             self.columna +=1
-            self.estado = 8    
+            self.estado = 8  
 #! --->=============
         elif caracter == "<":
             self.lexema += caracter
@@ -117,7 +118,7 @@ class AnalizadorLexico():
                 #? Asignamos nuestras palabras reservadas
                 #? formulario, tipo, valor, fondo, nombre
                 #? valores, evento
-            if self.lexema == "JORNADA" or self.lexema == "GOLES" or self.lexema == "TABLA" or self.lexema == "TEMPORADA" or self.lexema == "PARTIDOS" or self.lexema == "TOP" or self.lexema == "ADIOS" or self.lexema == "VS" or self.lexema == "TOTAL" or self.lexema == "LOCAL" or self.lexema == "VISITANTE":
+            if self.lexema == "JORNADA" or self.lexema == "GOLES" or self.lexema == "TABLA" or self.lexema == "TEMPORADA" or self.lexema == "PARTIDOS" or self.lexema == "TOP" or self.lexema == "ADIOS" or self.lexema == "VS" or self.lexema == "TOTAL" or self.lexema == "LOCAL" or self.lexema == "VISITANTE" or self.lexema == "RESULTADO":
                 self.agregar_token(self.lexema, "palabra reservada", self.linea, self.columna)
                 self.estado = 0
                 self.i -= 1
@@ -225,33 +226,26 @@ class AnalizadorLexico():
             self.columna+=1
             self.estado = 0
             self.i -= 1        
-
-#TODO CADENA NO TOCAR
     #!===========================================================
     #? Estado para creación de cadenas
-    def Estado8 (self, caracter : str):
-        if caracter.isalpha() or caracter == "-" or caracter == " ":
+     #!===========================================================
+    #? Estado para creación de cadenas
+    def Estado8(self, caracter : str):
+        if caracter != "\"": 
+            # caracter.isalpha() or caracter == "-" or caracter == " ": #"S-S S5 
             self.lexema += caracter
             self.columna +=1
-            self.estado = 3
-        elif caracter.isdigit():
-            self.lexema +=caracter
-            self.columna += 1    
-            self.estado = 3
+            self.estado = 8
         else: 
-            caracter == "'" or caracter == '"'
-            self.estado = 7 
+            caracter == "\""
+            self.estado = 9
             self.lexema +=caracter
-            self.columna += 1
-
-    def Estado9(self, caracter: str):
-        if caracter == '"' or caracter == "'":
-            self.estado = 7
-            self.lexema += caracter
-        else:         
-            self.agregar_token(self.lexema, "Cadena", self.linea, self.columna)
-            self.estado = 0
-            self.i -= 1
+            self.columna += 1     
+   
+    def Estado9(self, caracter: str):         
+        self.agregar_token(self.lexema, "Cadena", self.linea, self.columna)
+        self.estado = 0
+        self.i -= 1
     #!===========================================================
     #? Estado para creación de simbolos
     def Estado10 (self, caracter : str):
@@ -259,7 +253,7 @@ class AnalizadorLexico():
         if caracter == "[" or caracter == "]" or caracter == "<" or caracter == ">" or caracter == "-" : 
             self.lexema += caracter
             self.columna +=1
-            self.estado = 4        
+            self.estado = 10        
         else:
             if self.lexema == "[":
                 self.agregar_token(self.lexema, "Simbolo [", self.linea, self.columna)
@@ -268,7 +262,7 @@ class AnalizadorLexico():
             elif self.lexema == "<":
                 self.agregar_token(self.lexema, "Simbolo menor <", self.linea, self.columna)
             elif self.lexema == ">":
-                self.agregar_token(self.lexema, "Simbolo mayor <", self.linea, self.columna)
+                self.agregar_token(self.lexema, "Simbolo mayor >", self.linea, self.columna)
             elif self.lexema == "-":
                 self.agregar_token(self.lexema, "Simbolo guion -", self.linea, self.columna)
             self.estado = 0
@@ -279,9 +273,12 @@ class AnalizadorLexico():
     #? Estados para creación de decimales
 
     def Analizar(self, caracter):
-        self.ListaErrores = []
-        self.ListaTokens = []
-        self.i= 0
+        self.linea = 1
+        self.columna= 0
+        self.lexema = "" # strings
+        self.estado = 1  #
+        self.i = 0
+
         while self.i < len(caracter):
             if self.estado == 0:
                 self.Estado0(caracter[self.i])
@@ -298,9 +295,9 @@ class AnalizadorLexico():
             elif self.estado == 6:
                 self.Estado6(caracter[self.i])
             elif self.estado == 7:
-                self.Estado8(caracter[self.i])
+                self.Estado7(caracter[self.i])
             elif self.estado == 8:
-                self.Estado9(caracter[self.i])
+                self.Estado8(caracter[self.i])
             elif self.estado == 9:
                 self.Estado9(caracter[self.i])
             elif self.estado == 10:
@@ -337,14 +334,14 @@ class AnalizadorLexico():
         return x.get_html_string()
 
 
-    def iniciar(self):
+    
+    
+    def limpiaTokens(self):
         self.ListaTokens = []
-        self.ListaErrores = [] 
-        self.linea = 1
-        self.columna= 0
-        self.lexema = "" # strings
-        self.estado = 1  #
-        self.i = 0
+    def limpiarerror(self):
+        self.ListaErrores = []     
+
+
     def guardar(self, name: str, cadena: str, abrir: bool = True ):  #? es una libreria por defecto, sirve para manejo de rutas
         ruta = os.path.dirname(os.path.abspath(__file__))+"\\archivos"
         apertura= open("{}\\{}".format(ruta, name), encoding = "utf-8", mode = "w" )
