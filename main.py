@@ -1,4 +1,5 @@
 from glob import glob
+from sre_parse import State
 import tkinter as tk
 from tkinter import ttk
 import os as uso_
@@ -16,7 +17,7 @@ def ventana_creacion():
     #? creamo nuestro objeto 
     ventana = tk.Tk()
     #? modificamos el tamaño de la ventana
-    ventana.geometry('650x550')
+    ventana.geometry('950x550')
     #? titulo de la ventana
     ventana.title("Interfaz Gráfica")
     #? configuramos nuestro icono de nuestra app
@@ -34,55 +35,76 @@ def ventana_creacion():
     #! configuración de nuestro chat
     #? creacion de boton de reportes
     global boton_errores
-    boton_errores = Button(ventana, text = "Reporte de errores", width = "20", height="1", bg = "old lace" )
-    boton_errores.place(x=490, y =70)
+    boton_errores = Button(ventana, text = "Reporte de errores", command=errores, width = "20", height="1", bg = "old lace" )
+    boton_errores.place(x=790, y =70)
     
-    boton_lperrores = Button(ventana, text = "Limpiar log de errores", width = "20", height="1", bg = "old lace" )
-    boton_lperrores.place(x=490, y =100)
+    boton_lperrores = Button(ventana, text = "Limpiar log de errores", command= limpiarerr, width = "20", height="1", bg = "old lace" )
+    boton_lperrores.place(x=790, y =100)
     
-    boton_tokens = Button(ventana, text = "Reporte de tokens", width = "20", height="1", bg = "old lace" )
-    boton_tokens.place(x=490, y =130)
+    boton_tokens = Button(ventana, text = "Reporte de tokens", command=tokens, width = "20", height="1", bg = "old lace" )
+    boton_tokens.place(x=790, y =130)
     
-    boton_lptokens = Button(ventana, text = "Limpiar log de tokens", width = "20", height="1", bg = "old lace" )
-    boton_lptokens.place(x=490, y =160)
+    boton_lptokens = Button(ventana, text = "Limpiar log de tokens", command=limpiarTok, width = "20", height="1", bg = "old lace" )
+    boton_lptokens.place(x=790, y =160)
     #!==================================================================================================================
     #? Manuales de PDF 
     global boton_ManualUsuario
     boton_ManualUsuario = Button(ventana, text = "Manual de usuario", width = "20", height="1", bg = "#FFFFCC")
-    boton_ManualUsuario.place(x=490, y =190)
+    boton_ManualUsuario.place(x=790, y =190)
     
     global boton_ManualTecnico
     boton_ManualTecnico = Button(ventana, text = "Manual Técnico", width = "20", height="1", bg = "#FFFFCC")
-    boton_ManualTecnico.place(x=490, y =220)
-    
+    boton_ManualTecnico.place(x=790, y =220)
     
     boton_enviar = Button(ventana, text = "enviar", width = "15", command= analizar,  height="1", bg = "#FFFFCC"  )
-    boton_enviar.place(x=490, y =500)
+    boton_enviar.place(x=740, y =500)
+    
+    boton_reset = Button(ventana, text = "reset", width = "5", command= lmp,  height="1", bg = "#FFFFCC"  )
+    boton_reset.place(x=860, y =500)
     
     global caja_texto
-    caja_texto = ScrolledText(ventana, width = "50", height= "25")
+    caja_texto = ScrolledText(ventana, width = "85", height= "25")
     
     caja_texto.place(x=40, y = 60)
     global entry
     # Crear caja de texto.
-    entry = ttk.Entry(width=70)
+    entry = ttk.Entry(width=110)
     # Posicionarla en la ventana.
     entry.place(x=40, y=500)
 
     entrada.pack()
     ventana.mainloop()
+def lmp ():
+    entry.delete(0, END) #?reseteamos nuestra caja
+#? entradas de respuesta
+def preguntas():
+    txt = entry.get() + "\n"
+    caja_texto.config(state="normal")
+    caja_texto.tag_configure("nombre", justify="right") #! alineamos a la derecha
+    caja_texto.insert(INSERT, txt)#! insertamos nuestro texto ingresado en la caja
+    #? ojo a partir de aqui se hace la configuración
+    caja_texto.tag_add("nombre", "1.0", "end")
+    caja_texto.config(state=DISABLED)
+    return txt
+
 #? limpieza
 def analizar():
    #!traemos nuestros datos para manipulación y realización de tablas 
+    preguntas()
     a = entry.get() + " "#("1.0", tk.END
     # print(len(lexico.ListaTokens))
     #! reseteamos nuestras listas 
     lexico.Analizar(a) #? iniciamos nuestros tokens y la formulación de estos
+   
 def tokens():
     lexico.imprimirTokens()
 def errores():
     lexico.imprimirErrores()
 
+def limpiarTok():
+    lexico.limpiaTokens()
+def limpiarerr():
+    lexico.limpiarerror()
 
 def salir():
     sys.exit()
@@ -124,7 +146,6 @@ def imprimir(entrada):
 if __name__ == '__main__':
     ventana_creacion()
     lexico.Tabla_tokens()
-   
     print(len(lexico.ListaErrores))
 
 

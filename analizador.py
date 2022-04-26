@@ -54,14 +54,6 @@ class AnalizadorLexico():
             self.lexema += caracter
             self.columna += 1
             self.estado = 10
-        elif caracter == "[":
-            self.lexema += caracter
-            self.columna += 1
-            self.estado = 10
-        elif caracter == "]":
-            self.lexema += caracter
-            self.columna += 1
-            self.estado = 10
         elif caracter == "-":
             self.lexema += caracter
             self.columna += 1
@@ -255,11 +247,7 @@ class AnalizadorLexico():
             self.columna +=1
             self.estado = 10        
         else:
-            if self.lexema == "[":
-                self.agregar_token(self.lexema, "Simbolo [", self.linea, self.columna)
-            elif self.lexema == "]":
-                self.agregar_toke<(self.lexema, "Simbolo ]", self.linea, self.columna)
-            elif self.lexema == "<":
+            if self.lexema == "<":
                 self.agregar_token(self.lexema, "Simbolo menor <", self.linea, self.columna)
             elif self.lexema == ">":
                 self.agregar_token(self.lexema, "Simbolo mayor >", self.linea, self.columna)
