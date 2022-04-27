@@ -38,6 +38,10 @@ class AnalizadorLexico():
             self.lexema += caracter
             self.columna += 1
             self.estado = 6
+        elif caracter == "-":
+            self.lexema += caracter
+            self.columna += 1
+            self.estado = 10
 #! --->=============        
         elif caracter == '"':
             self.lexema += caracter
@@ -54,10 +58,7 @@ class AnalizadorLexico():
             self.lexema += caracter
             self.columna += 1
             self.estado = 10
-        elif caracter == "-":
-            self.lexema += caracter
-            self.columna += 1
-            self.estado = 10
+        
 
         elif caracter == "\t":
             self.columna +=1
@@ -110,28 +111,46 @@ class AnalizadorLexico():
                 #? Asignamos nuestras palabras reservadas
                 #? formulario, tipo, valor, fondo, nombre
                 #? valores, evento
-            if self.lexema == "JORNADA" or self.lexema == "GOLES" or self.lexema == "TABLA" or self.lexema == "TEMPORADA" or self.lexema == "PARTIDOS" or self.lexema == "TOP" or self.lexema == "ADIOS" or self.lexema == "VS" or self.lexema == "TOTAL" or self.lexema == "LOCAL" or self.lexema == "VISITANTE" or self.lexema == "RESULTADO":
-                self.agregar_token(self.lexema, "palabra reservada", self.linea, self.columna)
-                self.estado = 0
-                self.i -= 1
+            if self.lexema == "RESULTADO":
+                self.agregar_token(self.lexema, "TK_result", self.linea, self.columna)
+            elif self.lexema == "VS":
+                self.agregar_token(self.lexema, "TK_vs", self.linea, self.columna)
+            elif self.lexema == "TEMPORADA":
+                self.agregar_token(self.lexema, "TK_temp", self.linea, self.columna)
+            elif self.lexema == "JORNADA":
+                self.agregar_token(self.lexema, "TK_jorn", self.linea, self.columna)
+            elif self.lexema == "GOLES":
+                self.agregar_token(self.lexema, "TK_gol", self.linea, self.columna)
+            elif self.lexema == "LOCAL":
+                self.agregar_token(self.lexema, "TK_local", self.linea, self.columna)
+            elif self.lexema == "VISITANTE":
+                self.agregar_token(self.lexema, "TK_visitante", self.linea, self.columna)
+            elif self.lexema == "TOTAL":
+                self.agregar_token(self.lexema, "TK_total", self.linea, self.columna)
+            elif self.lexema == "PARTIDOS":
+                self.agregar_token(self.lexema, "TK_part", self.linea, self.columna)
+            elif self.lexema == "TABLA":
+                self.agregar_token(self.lexema, "TK_tabla", self.linea, self.columna)
+            elif self.lexema == "TOP":
+                self.agregar_token(self.lexema, "TK_top", self.linea, self.columna)
+            elif self.lexema == "SUPERIOR":
+                self.agregar_token(self.lexema, "TK_sup", self.linea, self.columna)
+            elif self.lexema == "INFERIOR":
+                self.agregar_token(self.lexema, "TK_inf", self.linea, self.columna)
+            elif self.lexema == "ADIOS":
+                self.agregar_token(self.lexema, "TK_adios", self.linea, self.columna)
         #!======================================================
             # elif self.lexema == "Nombre" or self.lexema =="Ingrese Nombre" or self.lexema == "Guatemala" or self.lexema == "El salvador" or self.lexema ==" Honduras":
             #     self.agregar_token(self.lexema, "Cadena, seguida de letras minusculas/numeros/espacios ", self.linea, self.columna)
             #     self.estado = 0
             #     self.i -= 1
-            
             elif self.lexema == "archivo" :
-                self.agregar_token(self.lexema, "Identificador", self.linea, self.columna)
-                self.estado = 0
-                self.i -= 1
-            
+                self.agregar_token(self.lexema, "tk_id", self.linea, self.columna)
         #!======================================================
                 #?Asignamos nuestras palabras idetinficadores
                 #?etiqueta, texto, grupo-radio, grupo-option, boton, EVENTO
-            else: 
-                self.agregar_token(self.lexema, "Identificador", self.linea, self.columna)  
-                self.estado = 0
-                self.i -= 1
+            self.estado = 0
+            self.i -= 1
     
     #!===========================================================
     #? Estados de digitos enteros
@@ -143,7 +162,7 @@ class AnalizadorLexico():
             self.columna += 1
             self.estado = 3
         else:
-            self.agregar_token(self.lexema, "Numero: se ingreso un número", self.linea, self.columna)
+            self.agregar_token(self.lexema, "tk_num", self.linea, self.columna)
             self.estado = 0
             self.i -= 1
     
@@ -157,7 +176,7 @@ class AnalizadorLexico():
             self.columna += 1
             self.estado = 4
         else: 
-            self.agregar_token(self.lexema, "Numero: se ingreso un número", self.linea, self.columna)
+            self.agregar_token(self.lexema, "tk_num", self.linea, self.columna)
             self.estado = 0
             self.i -= 1
     
@@ -165,7 +184,6 @@ class AnalizadorLexico():
     #? Estados de digitos enteros
     def Estado4 (self, caracter : str):
     #!===========================================================    
-    
         '''Estado s4'''
         if caracter.isdigit():
             self.lexema +=caracter
@@ -190,19 +208,26 @@ class AnalizadorLexico():
             self.columna += 1
             self.estado = 5
         else:
-            self.agregar_token(self.lexema, "Digito: Se ingreso un año", self.linea, self.columna)
+            self.agregar_token(self.lexema, "tk_año", self.linea, self.columna)
             self.estado = 0
             self.i -= 1
     #!=========================================================== 
     def Estado6 (self, caracter : str):
     #!===========================================================   
         '''Estado s6'''
-        if caracter == "jf" or caracter == "ji" or caracter == "f" or caracter == "n":
+        if self.lexema == "jf" or self.lexema == "ji" or self.lexema == "f" or self.lexema == "n":
             self.lexema +=caracter
             self.columna += 1
             self.estado = 7
+        # elif caracter.isalpha(): # tipo
+        #     self.lexema += caracter 
+        #     self.columna +=1
+        #     self.estado = 6
         else:
-            self.agregar_token(self.lexema, "Simbolo: signo (-)", self.linea, self.columna)
+            if self.lexema == "-jf":
+                self.agregar_token(self.lexema, "tkb", self.linea, self.columna)
+            elif self.lexema == "-ji":
+                self.agregar_token(self.lexema, "tkb1", self.linea, self.columna)
             self.estado = 0
             self.columna += 1
             self.i -= 1 
@@ -211,10 +236,18 @@ class AnalizadorLexico():
         '''Estado s7'''
     #!=========================================================== 
         if caracter == "-jf" or caracter == "-ji" or caracter == "-f" or caracter == "-n":
+        # if self.lexema in ['-jf', '-ji', '-f', '-n']:   
             self.lexema +=caracter
             self.columna += 1
         else:
-            self.agregar_token(self.lexema, "palabra reservada", self.linea, self.columna)
+            if self.lexema == "-jf":
+                self.agregar_token(self.lexema, "tkb", self.linea, self.columna)
+            elif self.lexema == "-ji":
+                self.agregar_token(self.lexema, "tkb1", self.linea, self.columna)
+            elif self.lexema == "-f":
+                self.agregar_token(self.lexema, "tkb2", self.linea, self.columna)
+            elif self.lexema == "-n":
+                self.agregar_token(self.lexema, "tkb3", self.linea, self.columna)
             self.columna+=1
             self.estado = 0
             self.i -= 1        
@@ -235,7 +268,7 @@ class AnalizadorLexico():
             self.columna += 1     
    
     def Estado9(self, caracter: str):         
-        self.agregar_token(self.lexema, "Cadena", self.linea, self.columna)
+        self.agregar_token(self.lexema, "tk_cadena", self.linea, self.columna)
         self.estado = 0
         self.i -= 1
     #!===========================================================
@@ -248,11 +281,11 @@ class AnalizadorLexico():
             self.estado = 10        
         else:
             if self.lexema == "<":
-                self.agregar_token(self.lexema, "Simbolo menor <", self.linea, self.columna)
+                self.agregar_token(self.lexema, "tk_smen", self.linea, self.columna)
             elif self.lexema == ">":
-                self.agregar_token(self.lexema, "Simbolo mayor >", self.linea, self.columna)
+                self.agregar_token(self.lexema, "tj_smay", self.linea, self.columna)
             elif self.lexema == "-":
-                self.agregar_token(self.lexema, "Simbolo guion -", self.linea, self.columna)
+                self.agregar_token(self.lexema, "tk_s", self.linea, self.columna)
             self.estado = 0
             self.columna += 1
             self.i -= 1    

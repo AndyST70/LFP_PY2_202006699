@@ -1,4 +1,5 @@
 from glob import glob
+from math import sin
 from sre_parse import State
 import tkinter as tk
 from tkinter import ttk
@@ -11,7 +12,9 @@ import sys
 from turtle import width
 from analizador import AnalizadorLexico
 import webbrowser
+from analizadorsintactico import AnalizadorSintactico
 lexico = AnalizadorLexico ()
+sintactico = AnalizadorSintactico(1)
 def ventana_creacion():
     #!ttk son los componentes
     #? creamo nuestro objeto 
@@ -91,11 +94,11 @@ def preguntas():
 def analizar():
    #!traemos nuestros datos para manipulación y realización de tablas 
     preguntas()
-    a = entry.get() + " "#("1.0", tk.END
+    a = entry.get() + " "#("1.0", tk.END #campo de texto o cajita
     # print(len(lexico.ListaTokens))
     #! reseteamos nuestras listas 
-    lexico.Analizar(a) #? iniciamos nuestros tokens y la formulación de estos
-   
+    lexico.Analizar(a) #? Analisis Lexico
+    
 def tokens():
     lexico.imprimirTokens()
 def errores():
@@ -148,5 +151,13 @@ if __name__ == '__main__':
     lexico.Tabla_tokens()
     print(len(lexico.ListaErrores))
 
+    
+    guardartokens = lexico.ListaTokens
+    copia= guardartokens
+    #TODO ANALISIS SINTACTICO
+    #!===============================================================
+    sintactico = AnalizadorSintactico(copia)
+    sintactico.analizar()
+    sintactico.imprimirErrores()
 
 #! los manuales actuales son de prueba, no debe usarse por ahora
