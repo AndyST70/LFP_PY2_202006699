@@ -873,3 +873,4 @@ class AnalizadorSintactico:
         for error_ in self.errores:
             x.add_row([error_])
         print(x)
+    

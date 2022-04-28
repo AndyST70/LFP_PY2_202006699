@@ -100,7 +100,7 @@ def analizar():
     # print(len(lexico.ListaTokens))
     #! reseteamos nuestras listas 
     lexico.Analizar(a) #? Analisis Lexico
-    guardartokens = lexico.ListaTokens
+    guardartokens = lexico.ListaTokens2
     copia= guardartokens
     #TODO ANALISIS SINTACTICO
     #!===============================================================
@@ -110,13 +110,16 @@ def analizar():
     sintactico.imprimirErrores()
     sintactico.limpieza()
     
+    
 def tokens():
     lexico.imprimirTokens()
+    lexico.imprimirTokens2()
 def errores():
     lexico.imprimirErrores()
 
 def limpiarTok():
     lexico.limpiaTokens()
+    lexico.limpieza2()
 def limpiarerr():
     lexico.limpiarerror()
 

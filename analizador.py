@@ -4,8 +4,10 @@ from prettytable import PrettyTable
 import os
 from tkinter import messagebox
 class AnalizadorLexico():
+    
     def __init__(self):
         self.ListaTokens = []
+        self.ListaTokens2= []
         self.ListaErrores = [] 
         self.linea = 1
         self.columna= 0
@@ -14,10 +16,11 @@ class AnalizadorLexico():
         self.i = 0 #? con este vamos recorriendo nuestras listas y guardando
         #tipo, lexema, linea y columna
     # while=?
-    def copia_tokens(self):
-        self.copia = self.ListaTokens
+    def limpieza2(self):
+        self.ListaTokens2.clear()
     def agregar_token(self, caracter, tipo, linea, columna ):
         self.ListaTokens.append(constructor(caracter, linea, columna, tipo))
+        
         self.lexema = ""
     def error_append(self, caracter, linea, columna,  tipo):
         self.ListaErrores.append(Error("caracter: ", caracter, "linea: ", linea, "columna: ", columna, "tipo", tipo))
@@ -315,6 +318,7 @@ class AnalizadorLexico():
         self.lexema = "" # strings
         self.estado = 1  #
         self.i = 0
+        self.ListaTokens.clear()  
 
         while self.i < len(caracter):
             if self.estado == 0:
@@ -339,7 +343,10 @@ class AnalizadorLexico():
                 self.Estado9(caracter[self.i])
             elif self.estado == 10:
                 self.Estado10(caracter[self.i])
+
+            
             self.i += 1
+        self.ListaTokens2.extend(self.ListaTokens)
 
     def imprimirTokens(self):
         '''Imprime una tabla con los tokens'''
@@ -354,7 +361,20 @@ class AnalizadorLexico():
         
         self.Tabla_tokens(x.get_html_string(),"tokens")
         return x.get_html_string()
-
+    def imprimirTokens2(self):
+        '''Imprime una tabla con los tokens'''
+        x = PrettyTable()
+        x.field_names = ["Lexema","linea","columna","tipo"]
+        if len(self.ListaTokens2) >0:
+            for token in self.ListaTokens2:
+                x.add_row([token.descripcion, token.linea, token.columna,token.tipo])
+            print(x)
+        else: 
+            messagebox.showinfo("Advertencia", "tabla 2")
+        
+        self.Tabla_tokens(x.get_html_string(),"Analisis Sintactico")
+        return x.get_html_string()
+    
     def imprimirErrores(self):
         '''Imprime una tabla con los errores'''
         x = PrettyTable()
