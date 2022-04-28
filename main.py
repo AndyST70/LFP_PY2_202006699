@@ -14,6 +14,8 @@ from analizador import AnalizadorLexico
 import webbrowser
 from analizadorsintactico import AnalizadorSintactico
 lexico = AnalizadorLexico ()
+#guardamos nuestros tokens
+
 sintactico = AnalizadorSintactico(1)
 def ventana_creacion():
     #!ttk son los componentes
@@ -98,6 +100,15 @@ def analizar():
     # print(len(lexico.ListaTokens))
     #! reseteamos nuestras listas 
     lexico.Analizar(a) #? Analisis Lexico
+    guardartokens = lexico.ListaTokens
+    copia= guardartokens
+    #TODO ANALISIS SINTACTICO
+    #!===============================================================
+    
+    sintactico = AnalizadorSintactico(copia)
+    sintactico.analizar()
+    sintactico.imprimirErrores()
+    sintactico.limpieza()
     
 def tokens():
     lexico.imprimirTokens()
@@ -152,12 +163,7 @@ if __name__ == '__main__':
     print(len(lexico.ListaErrores))
 
     
-    guardartokens = lexico.ListaTokens
-    copia= guardartokens
-    #TODO ANALISIS SINTACTICO
-    #!===============================================================
-    sintactico = AnalizadorSintactico(copia)
-    sintactico.analizar()
-    sintactico.imprimirErrores()
+   
+    
 
 #! los manuales actuales son de prueba, no debe usarse por ahora

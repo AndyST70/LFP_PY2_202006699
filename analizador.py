@@ -14,6 +14,8 @@ class AnalizadorLexico():
         self.i = 0 #? con este vamos recorriendo nuestras listas y guardando
         #tipo, lexema, linea y columna
     # while=?
+    def copia_tokens(self):
+        self.copia = self.ListaTokens
     def agregar_token(self, caracter, tipo, linea, columna ):
         self.ListaTokens.append(constructor(caracter, linea, columna, tipo))
         self.lexema = ""
@@ -33,11 +35,6 @@ class AnalizadorLexico():
             self.lexema += caracter
             self.columna +=1
             self.estado = 2
-
-        elif caracter =="-":
-            self.lexema += caracter
-            self.columna += 1
-            self.estado = 6
         elif caracter == "-":
             self.lexema += caracter
             self.columna += 1
@@ -55,6 +52,10 @@ class AnalizadorLexico():
             self.estado = 10
 
         elif caracter == ">":
+            self.lexema += caracter
+            self.columna += 1
+            self.estado = 10
+        elif caracter == "[":
             self.lexema += caracter
             self.columna += 1
             self.estado = 10
@@ -149,6 +150,8 @@ class AnalizadorLexico():
         #!======================================================
                 #?Asignamos nuestras palabras idetinficadores
                 #?etiqueta, texto, grupo-radio, grupo-option, boton, EVENTO
+            else:
+                self.agregar_token(self.lexema, "tk_id", self.linea, self.columna)   
             self.estado = 0
             self.i -= 1
     
@@ -215,42 +218,47 @@ class AnalizadorLexico():
     def Estado6 (self, caracter : str):
     #!===========================================================   
         '''Estado s6'''
-        if self.lexema == "jf" or self.lexema == "ji" or self.lexema == "f" or self.lexema == "n":
-            self.lexema +=caracter
-            self.columna += 1
-            self.estado = 7
-        # elif caracter.isalpha(): # tipo
-        #     self.lexema += caracter 
-        #     self.columna +=1
-        #     self.estado = 6
+        if caracter.isalpha() or caracter == "-": # tipo
+            self.lexema += caracter 
+            self.columna +=1
+            self.estado = 6
+        # elif self.lexema == "jf" or self.lexema == "ji" or self.lexema == "f" or self.lexema == "n":
+        #     self.lexema +=caracter
+        #     self.columna += 1
+        #     self.estado = 7
         else:
-            if self.lexema == "-jf":
-                self.agregar_token(self.lexema, "tkb", self.linea, self.columna)
-            elif self.lexema == "-ji":
+        
+            if self.lexema == "-ji":
                 self.agregar_token(self.lexema, "tkb1", self.linea, self.columna)
+            elif self.lexema == "-jf":
+                self.agregar_token(self.lexema, "tkb2", self.linea, self.columna)
+            elif self.lexema == "-f":
+                self.agregar_token(self.lexema, "tkb", self.linea, self.columna)
+            elif self.lexema == "-n":
+                self.agregar_token(self.lexema, "tkb3", self.linea, self.columna)
             self.estado = 0
             self.columna += 1
             self.i -= 1 
-    #!=========================================================== 
-    def Estado7 (self, caracter : str):
-        '''Estado s7'''
-    #!=========================================================== 
-        if caracter == "-jf" or caracter == "-ji" or caracter == "-f" or caracter == "-n":
-        # if self.lexema in ['-jf', '-ji', '-f', '-n']:   
-            self.lexema +=caracter
-            self.columna += 1
-        else:
-            if self.lexema == "-jf":
-                self.agregar_token(self.lexema, "tkb", self.linea, self.columna)
-            elif self.lexema == "-ji":
-                self.agregar_token(self.lexema, "tkb1", self.linea, self.columna)
-            elif self.lexema == "-f":
-                self.agregar_token(self.lexema, "tkb2", self.linea, self.columna)
-            elif self.lexema == "-n":
-                self.agregar_token(self.lexema, "tkb3", self.linea, self.columna)
-            self.columna+=1
-            self.estado = 0
-            self.i -= 1        
+    # #!=========================================================== 
+    # def Estado7 (self, caracter : str):
+    #     '''Estado s7'''
+    # #!=========================================================== 
+    #     if caracter == "-jf" or caracter == "-ji" or caracter == "-f" or caracter == "-n":
+    #     # if self.lexema in ['-jf', '-ji', '-f', '-n']:   
+    #         self.lexema +=caracter
+    #         self.columna += 1
+    #     else:
+    #         if self.lexema == "-f":
+    #             self.agregar_token(self.lexema, "tkb", self.linea, self.columna)
+    #         elif self.lexema == "-ji":
+    #             self.agregar_token(self.lexema, "tkb1", self.linea, self.columna)
+    #         elif self.lexema == "-jf":
+    #             self.agregar_token(self.lexema, "tkb2", self.linea, self.columna)
+    #         elif self.lexema == "-n":
+    #             self.agregar_token(self.lexema, "tkb3", self.linea, self.columna)
+    #         self.columna+=1
+    #         self.estado = 0
+    #         self.i -= 1        
     #!===========================================================
     #? Estado para creación de cadenas
      #!===========================================================
@@ -275,18 +283,26 @@ class AnalizadorLexico():
     #? Estado para creación de simbolos
     def Estado10 (self, caracter : str):
         '''estado q4'''
-        if caracter == "[" or caracter == "]" or caracter == "<" or caracter == ">" or caracter == "-" : 
+        if caracter == "<" or caracter == ">": 
             self.lexema += caracter
             self.columna +=1
-            self.estado = 10        
+            self.estado = 10
+        elif caracter == "-":
+            self.lexema += caracter
+            self.columna +=1
+            self.estado = 6
+        elif caracter.isalpha():
+            self.lexema += caracter 
+            self.columna +=1
+            self.estado = 6
         else:
             if self.lexema == "<":
                 self.agregar_token(self.lexema, "tk_smen", self.linea, self.columna)
             elif self.lexema == ">":
-                self.agregar_token(self.lexema, "tj_smay", self.linea, self.columna)
+                self.agregar_token(self.lexema, "tk_smay", self.linea, self.columna)
             elif self.lexema == "-":
                 self.agregar_token(self.lexema, "tk_s", self.linea, self.columna)
-            self.estado = 0
+            self.estado = 0  # 20 - 20
             self.columna += 1
             self.i -= 1    
   
