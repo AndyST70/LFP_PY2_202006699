@@ -1,14 +1,15 @@
-from lib2to3.pgen2 import token
-from pickle import NONE
-from tokenize import Token
+
 from Token import constructor
 from prettytable import PrettyTable
-
+from lectorcvs import ImportarCSV
+import os
 class AnalizadorSintactico:
     def __init__(self, tokens: list) -> None:
         self.errores = []
         self.tokens = tokens
         self.i= 0
+        ruta = os.path.dirname(os.path.abspath(__file__)) + "\\archivos\\LaLigaBot-LFP.csv"
+        self.csv = ImportarCSV(ruta)
     def limpieza(self):
         self.tokens = []
     def agregarError(self, entrada, pila, columna, fila):
@@ -29,10 +30,12 @@ class AnalizadorSintactico:
             return None
     def analizar(self):
         '''S hace ref a estados'''
-        self.S()
+        return self.S()
+        
 
     def S(self):
-        self.INICIO()
+        return self.INICIO()
+        
 
     def INICIO(self):
         '''Observa el primero y escoge la ruta'''
@@ -42,19 +45,19 @@ class AnalizadorSintactico:
         if vartmp is None:
             self.agregarError("TK_result | TK_jorn | TK_temp | TK_gol | TK_tabla | TK_part | TK_top", "sin datos")
         elif vartmp.tipo == "TK_result":
-            self.RESULT()
+            return self.RESULT()
         elif vartmp.tipo == "TK_jorn":
-            self.JORNA()
+            return self.JORNA()
         elif vartmp.tipo == "TK_gol":
-            self.GOL()
+            return self.GOL()
         elif vartmp.tipo == "TK_tabla":
-            self.TABLA()
+            return self.TABLA()
         elif vartmp.tipo == "TK_part":
-            self.PARTIDO()
+            return self.PARTIDO()
         elif vartmp.tipo == "TK_top":
-            self.TOP()
+            return self.TOP()
         elif vartmp.tipo == "TK_adios":
-            self.ADIOS()
+            return self.ADIOS()
         else: 
             self.agregarError("TK_result | TK_jorn | TK_temp | TK_gol | TK_tabla | TK_part | TK_top", vartmp.tipo)
         
@@ -63,6 +66,10 @@ class AnalizadorSintactico:
     def RESULT (self):
         '''RESULTADO equipo VS equipo TEMPORADA <YYYY-YYYY>'''
         #? se espera reservada -- TK_result
+        e1 = None
+        e2 = None
+        año = None
+        año1 = None
         token = self.sacarToken()
         if token.tipo == "TK_result":
             i =+ len(token.descripcion)
@@ -74,6 +81,7 @@ class AnalizadorSintactico:
                 return
             #!Sacar otro toke -- Se espera cadena
             elif token.tipo == "tk_cadena":
+                e1 = token.descripcion
                 i =+ len(token.descripcion)
                 token = self.sacarToken()
                 if token is None:
@@ -91,6 +99,7 @@ class AnalizadorSintactico:
                         return
                     #! Sacar otro tokens -- Se espera cadena
                     elif token.tipo == "tk_cadena":
+                        e2 = token.descripcion
                         i =+ len(token.descripcion)
                         token = self.sacarToken()    
                         if token is None:
@@ -116,6 +125,7 @@ class AnalizadorSintactico:
                                     return
                                 #! Sacar otro tokens -- Se espera tk_año
                                 elif token.tipo == "tk_año":
+                                    año = token.descripcion
                                     i =+ len(token.descripcion)
                                     token = self.sacarToken()    
                                     if token is None:
@@ -132,6 +142,7 @@ class AnalizadorSintactico:
                                             return
                                         #! Sacar otro tokens -- Se espera tk_año
                                         elif token.tipo == "tk_año":
+                                            año1 = token.descripcion
                                             i =+ len(token.descripcion)
                                             token = self.sacarToken()    
                                             if token is None:
@@ -141,8 +152,10 @@ class AnalizadorSintactico:
                                             #! Sacar otro tokens -- Se espera tk_año
                                             elif token.tipo == "tk_smay":   
                                                 i =+ len(token.descripcion)
-                                                print ("correcto manito wuu")    
-                                                
+                                                print ("Se ingreso correctamente")    
+                                                datos_resultados = self.csv.resultado_partido(e1, e2, año, año1)
+                                                print(datos_resultados)
+                                                return "Resultado es: {0} {1} - {2} {3}".format(e1, datos_resultados[0][3], e2, datos_resultados[0][4])
                                             else:
                                                 i =+ len(token.descripcion)
                                                 self.agregarError("token incorrecto", "falto signo mayor", i, 1)
@@ -175,6 +188,7 @@ class AnalizadorSintactico:
             self.agregarError("token incorrecto", "RESULTADO",i, 1)
     #* <INS>::= tkb tk_id | ε
     def INS(self):
+        nombre = None
         token = self.observarToken()
         #se esperaba una bandera | vacio 
         if token is None:
@@ -189,6 +203,7 @@ class AnalizadorSintactico:
                 self.agregarError("tkb", "Se esperaba -f", i, 1 )
                 return 
             elif token.tipo == "tkb":
+                
                 i =+ len(token.descripcion)
                 token = self.sacarToken()    
                 
@@ -198,9 +213,10 @@ class AnalizadorSintactico:
                     self.agregarError("tk_id", "sin datos", i,1)
                     
                 elif token.tipo == "tk_id":
+                    nombre = token.descripcion
                     i =+ len(token.descripcion)
                     print("todo bien", token.descripcion)
-                    return token.descripcion
+                    return nombre
                 else: 
                     i =+ len(token.descripcion)
                     self.agregarError("tkb", "Se esperaba -f", i, 1)
@@ -212,7 +228,6 @@ class AnalizadorSintactico:
         numero= None
         año1  = None
         año2 = None
-        name = None
         #? se espera reservada -- TK_jorn
         token = self.sacarToken()
         if token.tipo == "TK_jorn":
@@ -225,6 +240,7 @@ class AnalizadorSintactico:
             
             #!Sacar otro toke -- Se espera numero
             elif token.tipo == "tk_num":
+                numero = token.descripcion
                 i =+ len(token.descripcion)
                 token = self.sacarToken()
                 if token is None:
@@ -250,6 +266,7 @@ class AnalizadorSintactico:
 
                         #! Sacar otro tokens -- Se espera tk_año
                         elif token.tipo == "tk_año":
+                            año1 = token.descripcion
                             i =+ len(token.descripcion)
                             token = self.sacarToken()    
                             if token is None:
@@ -267,6 +284,7 @@ class AnalizadorSintactico:
                                     return
                                 #! Sacar otro tokens -- Se espera tk_año
                                 elif token.tipo == "tk_año":
+                                    año2 = token.descripcion
                                     i =+ len(token.descripcion)
                                     token = self.sacarToken()    
                                     if token is None:
@@ -277,7 +295,7 @@ class AnalizadorSintactico:
                                     #! Sacar otro tokens -- Se espera tk_año
                                     elif token.tipo == "tk_smay":   
                                         i =+ len(token.descripcion)
-                                        print ("correcto manito wuu")
+                                        print ("Se ingreso correctamente")
                                         encontramos_name = self.INS()
                                         if encontramos_name is None:
                                             i =+ len(token.descripcion)
@@ -488,7 +506,7 @@ class AnalizadorSintactico:
                                 #! Sacar otro tokens -- Se espera tk_año
                                 elif token.tipo == "tk_smay":   
                                     i =+ len(token.descripcion)
-                                    print ("correcto manito wuu")
+                                    print ("Se ingreso correctamente")
                                     encontramos_name = self.INS()
                                     if encontramos_name is None:
                                         i =+ len(token.descripcion)
@@ -589,7 +607,7 @@ class AnalizadorSintactico:
                                             return
                                     elif token.tipo == "tk_smay":
                                         i =+ len(token.descripcion)
-                                        print ("correcto manito wuu")
+                                        print ("Se ingreso correctamente")
                                         #? se espera -f
                                         encontramos_name = self.INS()
                                         if encontramos_name is None:
@@ -773,7 +791,7 @@ class AnalizadorSintactico:
                                             return
                                     elif token.tipo == "tk_smay":
                                         i =+ len(token.descripcion)
-                                        print ("correcto manito wuu")
+                                        print ("Se ingreso correctamente")
                                         #? se espera -f
                                         encontramos_name = self.INS3()
                                         if encontramos_name is None:
@@ -873,4 +891,3 @@ class AnalizadorSintactico:
         for error_ in self.errores:
             x.add_row([error_])
         print(x)
-    

@@ -1,6 +1,3 @@
-from glob import glob
-from math import sin
-from sre_parse import State
 import tkinter as tk
 from tkinter import ttk
 import os as uso_
@@ -9,7 +6,6 @@ from tkinter.scrolledtext import ScrolledText
 from tkinter import *
 from tkinter.filedialog import askopenfile
 import sys
-from turtle import width
 from analizador import AnalizadorLexico
 import webbrowser
 from analizadorsintactico import AnalizadorSintactico
@@ -79,6 +75,7 @@ def ventana_creacion():
 
     entrada.pack()
     ventana.mainloop()
+   
 def lmp ():
     entry.delete(0, END) #?reseteamos nuestra caja
 #? entradas de respuesta
@@ -86,9 +83,10 @@ def preguntas():
     txt = entry.get() + "\n"
     caja_texto.config(state="normal")
     caja_texto.tag_configure("nombre", justify="right") #! alineamos a la derecha
-    caja_texto.insert(INSERT, txt)#! insertamos nuestro texto ingresado en la caja
+    caja_texto.insert(INSERT, txt, "nombre")#! insertamos nuestro texto ingresado en la caja
+    # lineas = int(caja_texto.index("end").split(".")[0])
     #? ojo a partir de aqui se hace la configuración
-    caja_texto.tag_add("nombre", "1.0", "end")
+    # caja_texto.tag_add("nombre", "{}.0".format(lineas), "{}.end".format(lineas))
     caja_texto.config(state=DISABLED)
     return txt
 
@@ -106,7 +104,7 @@ def analizar():
     #!===============================================================
     
     sintactico = AnalizadorSintactico(copia)
-    sintactico.analizar()
+    respuestas_imprimir(sintactico.analizar())
     sintactico.imprimirErrores()
     sintactico.limpieza()
     
@@ -154,10 +152,15 @@ def rutars(entrada):
     webbrowser.open_new(ruta_datos)
     print(ruta_datos)
 
-def imprimir(entrada):
-    
-    pass
-
+def respuestas_imprimir(dato):
+    caja_texto.config(state="normal")
+    caja_texto.tag_configure("respuesta", justify="left") #! alineamos a la derecha
+    caja_texto.insert(INSERT, dato + "\n", "respuesta" )#! insertamos nuestro texto ingresado en la caja
+    # lineas = int(caja_texto.index("end").split(".")[0])
+    #? ojo a partir de aqui se hace la configuración
+    # caja_texto.tag_add("respuesta", "{}.0".format(lineas), "{}.end".format(lineas))
+    caja_texto.config(state=DISABLED)
+    return dato 
 
     # #? creacion de mensajes
 if __name__ == '__main__':

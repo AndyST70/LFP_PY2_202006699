@@ -44,8 +44,7 @@ class AnalizadorLexico():
             self.estado = 10
 #! --->=============        
         elif caracter == '"':
-            self.lexema += caracter
-
+            # self.lexema += caracter
             self.columna +=1
             self.estado = 8  
 #! --->=============
@@ -275,7 +274,7 @@ class AnalizadorLexico():
         else: 
             caracter == "\""
             self.estado = 9
-            self.lexema +=caracter
+            # self.lexema +=caracter
             self.columna += 1     
    
     def Estado9(self, caracter: str):         
