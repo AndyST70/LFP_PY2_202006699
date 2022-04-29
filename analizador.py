@@ -241,27 +241,7 @@ class AnalizadorLexico():
             self.estado = 0
             self.columna += 1
             self.i -= 1 
-    # #!=========================================================== 
-    # def Estado7 (self, caracter : str):
-    #     '''Estado s7'''
-    # #!=========================================================== 
-    #     if caracter == "-jf" or caracter == "-ji" or caracter == "-f" or caracter == "-n":
-    #     # if self.lexema in ['-jf', '-ji', '-f', '-n']:   
-    #         self.lexema +=caracter
-    #         self.columna += 1
-    #     else:
-    #         if self.lexema == "-f":
-    #             self.agregar_token(self.lexema, "tkb", self.linea, self.columna)
-    #         elif self.lexema == "-ji":
-    #             self.agregar_token(self.lexema, "tkb1", self.linea, self.columna)
-    #         elif self.lexema == "-jf":
-    #             self.agregar_token(self.lexema, "tkb2", self.linea, self.columna)
-    #         elif self.lexema == "-n":
-    #             self.agregar_token(self.lexema, "tkb3", self.linea, self.columna)
-    #         self.columna+=1
-    #         self.estado = 0
-    #         self.i -= 1        
-    #!===========================================================
+    # #!===========================================================      
     #? Estado para creación de cadenas
      #!===========================================================
     #? Estado para creación de cadenas
@@ -358,7 +338,7 @@ class AnalizadorLexico():
         else: 
             messagebox.showinfo("Advertencia", "Te falta la información")
         
-        self.Tabla_tokens(x.get_html_string(),"tokens")
+        self.Tabla_tokens(x.get_html_string(),"Analisis Sintactico")
         return x.get_html_string()
     def imprimirTokens2(self):
         '''Imprime una tabla con los tokens'''
@@ -371,7 +351,7 @@ class AnalizadorLexico():
         else: 
             messagebox.showinfo("Advertencia", "tabla 2")
         
-        self.Tabla_tokens(x.get_html_string(),"Analisis Sintactico")
+        self.Tabla_tokens(x.get_html_string(),"tokens")
         return x.get_html_string()
     
     def imprimirErrores(self):
@@ -405,7 +385,7 @@ class AnalizadorLexico():
         apertura.close()
         if abrir:
             os.system('start {}\\"{}"'.format(ruta, name))#? format = es para incrustar valores desde codigo a cadena
-    def busqueda(self, codigo ):
+    def busqueda(self, codigo):
         self.Analizar(codigo)
         self.Tabla_tokens(codigo)
 

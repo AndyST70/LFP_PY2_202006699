@@ -1,7 +1,10 @@
+from email import message
 import tkinter as tk
 from tkinter import ttk
 import os as uso_
 from tkinter import filedialog, Tk
+import os as ruta
+from tkinter import messagebox
 from tkinter.scrolledtext import ScrolledText
 from tkinter import *
 from tkinter.filedialog import askopenfile
@@ -50,11 +53,11 @@ def ventana_creacion():
     #!==================================================================================================================
     #? Manuales de PDF 
     global boton_ManualUsuario
-    boton_ManualUsuario = Button(ventana, text = "Manual de usuario", width = "20", height="1", bg = "#FFFFCC")
+    boton_ManualUsuario = Button(ventana, text = "Manual de usuario", command = manualusuario ,width = "20", height="1", bg = "#FFFFCC")
     boton_ManualUsuario.place(x=790, y =190)
     
     global boton_ManualTecnico
-    boton_ManualTecnico = Button(ventana, text = "Manual Técnico", width = "20", height="1", bg = "#FFFFCC")
+    boton_ManualTecnico = Button(ventana, text = "Manual Técnico", width = "20", command = manualtecnico, height="1", bg = "#FFFFCC")
     boton_ManualTecnico.place(x=790, y =220)
     
     boton_enviar = Button(ventana, text = "enviar", width = "15", command= analizar,  height="1", bg = "#FFFFCC"  )
@@ -75,7 +78,14 @@ def ventana_creacion():
 
     entrada.pack()
     ventana.mainloop()
-   
+def manualusuario():
+    ruta_datos = ruta.path.dirname(uso_.path.abspath(__file__))+ "\\archivos\\Manual Usuario 2.pdf"
+    webbrowser.open_new(ruta_datos)
+    print(ruta_datos)
+def manualtecnico():
+    ruta_datos = ruta.path.dirname(uso_.path.abspath(__file__))+ "\\archivos\\Manual Tecnico 2.pdf"
+    webbrowser.open_new(ruta_datos)
+    print(ruta_datos)
 def lmp ():
     entry.delete(0, END) #?reseteamos nuestra caja
 #? entradas de respuesta
@@ -98,7 +108,8 @@ def analizar():
     # print(len(lexico.ListaTokens))
     #! reseteamos nuestras listas 
     lexico.Analizar(a) #? Analisis Lexico
-    guardartokens = lexico.ListaTokens2
+    
+    guardartokens = lexico.ListaTokens
     copia= guardartokens
     #TODO ANALISIS SINTACTICO
     #!===============================================================
@@ -160,6 +171,9 @@ def respuestas_imprimir(dato):
     #? ojo a partir de aqui se hace la configuración
     # caja_texto.tag_add("respuesta", "{}.0".format(lineas), "{}.end".format(lineas))
     caja_texto.config(state=DISABLED)
+    if dato == "ADIOS":
+        messagebox.showinfo("Adios", "Adios, vuelve pronto...")
+        exit()
     return dato 
 
     # #? creacion de mensajes
@@ -167,7 +181,7 @@ if __name__ == '__main__':
     ventana_creacion()
     lexico.Tabla_tokens()
     print(len(lexico.ListaErrores))
-
+sintactico.imprimirErrores()
     
    
     

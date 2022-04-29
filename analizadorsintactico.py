@@ -2,6 +2,7 @@
 from Token import constructor
 from prettytable import PrettyTable
 from lectorcvs import ImportarCSV
+from tkinter import messagebox
 import os
 class AnalizadorSintactico:
     def __init__(self, tokens: list) -> None:
@@ -43,7 +44,7 @@ class AnalizadorSintactico:
         vartmp: constructor = self.observarToken()
         
         if vartmp is None:
-            self.agregarError("TK_result | TK_jorn | TK_temp | TK_gol | TK_tabla | TK_part | TK_top", "sin datos")
+            self.agregarError("TK_result | TK_jorn | TK_temp | TK_gol | TK_tabla | TK_part | TK_top", "sin datos", 1, 1)
         elif vartmp.tipo == "TK_result":
             return self.RESULT()
         elif vartmp.tipo == "TK_jorn":
@@ -59,7 +60,7 @@ class AnalizadorSintactico:
         elif vartmp.tipo == "TK_adios":
             return self.ADIOS()
         else: 
-            self.agregarError("TK_result | TK_jorn | TK_temp | TK_gol | TK_tabla | TK_part | TK_top", vartmp.tipo)
+            self.agregarError("TK_result | TK_jorn | TK_temp | TK_gol | TK_tabla | TK_part | TK_top", vartmp.tipo, 1, 1)
         
     
             
@@ -155,7 +156,7 @@ class AnalizadorSintactico:
                                                 print ("Se ingreso correctamente")    
                                                 datos_resultados = self.csv.resultado_partido(e1, e2, año, año1)
                                                 print(datos_resultados)
-                                                return "Resultado es: {0} {1} - {2} {3}".format(e1, datos_resultados[0][3], e2, datos_resultados[0][4])
+                                                return "El resultado de este partido fue: {0} {1} - {2} {3}".format(e1, datos_resultados[0][3], e2, datos_resultados[0][4])
                                             else:
                                                 i =+ len(token.descripcion)
                                                 self.agregarError("token incorrecto", "falto signo mayor", i, 1)
@@ -188,7 +189,6 @@ class AnalizadorSintactico:
             self.agregarError("token incorrecto", "RESULTADO",i, 1)
     #* <INS>::= tkb tk_id | ε
     def INS(self):
-        nombre = None
         token = self.observarToken()
         #se esperaba una bandera | vacio 
         if token is None:
@@ -212,7 +212,7 @@ class AnalizadorSintactico:
                     i =+ len(token.descripcion)
                     self.agregarError("tk_id", "sin datos", i,1)
                     
-                elif token.tipo == "tk_id":
+                elif token.tipo == "tk_id": 
                     nombre = token.descripcion
                     i =+ len(token.descripcion)
                     print("todo bien", token.descripcion)
@@ -228,6 +228,8 @@ class AnalizadorSintactico:
         numero= None
         año1  = None
         año2 = None
+        global nombre
+        nombre = None
         #? se espera reservada -- TK_jorn
         token = self.sacarToken()
         if token.tipo == "TK_jorn":
@@ -240,7 +242,8 @@ class AnalizadorSintactico:
             
             #!Sacar otro toke -- Se espera numero
             elif token.tipo == "tk_num":
-                numero = token.descripcion
+                
+                numero:int = token.descripcion
                 i =+ len(token.descripcion)
                 token = self.sacarToken()
                 if token is None:
@@ -296,13 +299,26 @@ class AnalizadorSintactico:
                                     elif token.tipo == "tk_smay":   
                                         i =+ len(token.descripcion)
                                         print ("Se ingreso correctamente")
+                                        # print(numero, año1, año2, nombre)
+
                                         encontramos_name = self.INS()
                                         if encontramos_name is None:
+                                            encontramos_name = "jornada.html"
                                             i =+ len(token.descripcion)
                                             print("Se agrega por defecto: jornada.html")
+#? ============================================================================================================
+                                               
+                                            # datos_resultados = self.csv.resultados_jornada(int(numero), int(año1), int(año2), nombre)
+                                           
+                                            # print(datos_resultados)
+                                            # return "Generando archivo de resultados jornada {0} temporada {1} - {2}".format(int(numero), año1, año2, )
                                         else:
                                             i =+ len(token.descripcion)
                                             print("asignación: ", encontramos_name)
+                                        datos_resultados = self.csv.resultados_jornada(int(numero), int(año1), int(año2), encontramos_name)                                           
+                                        print(datos_resultados)
+                                        return "Generando archivo de resultados jornada {0} temporada {1} - {2}".format(int(numero), año1, año2)
+
                                     else: 
                                         i =+ len(token.descripcion)
                                         self.agregarError("tk_smay", "Falto signo mayor", i,1)
@@ -330,6 +346,12 @@ class AnalizadorSintactico:
     def GOL (self):
         '''GOLES condición equipo TEMPORADA <YYYY-YYYY>'''
         #? se espera reservada -- TK_gol
+        global entr_cond
+        entr_cond = None# condicion
+        equipo = None
+        año1 = None
+        año2 = None
+
         token = self.sacarToken()
         if token.tipo == "TK_gol":
             i =+ len(token.descripcion)
@@ -348,6 +370,7 @@ class AnalizadorSintactico:
                     self.agregarError("tk_cadena", "sin datos", i, 1)
                     return
                 elif token.tipo == "tk_cadena":
+                    equipo = token.descripcion
                     i =+ len(token.descripcion)
                     token = self.sacarToken()
                     
@@ -375,6 +398,7 @@ class AnalizadorSintactico:
                                 self.agregarError("tk_año", "sin datos", i, 1)
                                 return
                             elif token.tipo == "tk_año":
+                                año1 = token.descripcion
                                 i =+ len(token.descripcion)
                                 token = self.sacarToken()
                                 
@@ -393,6 +417,7 @@ class AnalizadorSintactico:
                                         self.agregarError("tk_año", "sin datos", i, 1)
                                         return
                                     elif token.tipo == "tk_año":
+                                        año2 = token.descripcion
                                         i =+ len(token.descripcion)
                                         token = self.sacarToken()
                                         #!Sacar otro toke -- Se espera año
@@ -402,7 +427,12 @@ class AnalizadorSintactico:
                                             return
                                         elif token.tipo == "tk_smay":
                                             i =+ len(token.descripcion)
-                                            token = self.sacarToken()
+                                            
+                                            
+                                            datos_resultados = self.csv.resultados_goles(condicion, equipo, int(año1), int(año2))
+                                            print(datos_resultados)
+                                            return "Los goles anotados por el {0} en total en la temporada  {1} {2} fueron {3}".format(equipo, año1, año2, datos_resultados)
+
                                         else: 
                                             i =+ len(token.descripcion)
                                             self.agregarError("tk_smay", "Falto signo mayor >", i, 1)
@@ -442,15 +472,20 @@ class AnalizadorSintactico:
                 return
             elif token.tipo == "TK_local" or token.tipo == "TK_visitante" or token.tipo == "TK_total":
                 i =+ len(token.descripcion)
+                entr_cond = token.descripcion
                 print("La condicion: ", token.descripcion)
-                return token.descripcion
+                return entr_cond
             else:
                 i =+ len(token.descripcion)
                 self.agregarError("condicion", "Se esperaba TOTAL | VISITANTE | LOCAL", i,1)
-                
+        
     def TABLA(self):
         '''TABLA condición equipo TEMPORADA <YYYY-YYYY>'''
         #? se espera reservada -- TK_tab
+        año1 = None
+        año2 = None
+        global nombre
+        nombre = None
         token = self.sacarToken()
         if token.tipo == "TK_tabla":
             i =+ len(token.descripcion)
@@ -479,6 +514,7 @@ class AnalizadorSintactico:
                         self.agregarError("tk_año", "sin datos",i ,1)
                         return
                     elif token.tipo == "tk_año":
+                        año1 = token.descripcion
                         i =+ len(token.descripcion)
                         token = self.sacarToken()    
                         #! Sacar otro tokens -- Se espera guion -
@@ -495,6 +531,7 @@ class AnalizadorSintactico:
                                 self.agregarError("tk_año", "sin datos", i,1)
                                 return
                             elif token.tipo == "tk_año":
+                                año2 = token.descripcion
                                 i =+ len(token.descripcion)
                                 token = self.sacarToken()    
                                 
@@ -514,6 +551,10 @@ class AnalizadorSintactico:
                                     else:
                                         i =+ len(token.descripcion)
                                         print("asignación: ", encontramos_name)    
+                                    datos_resultados = self.csv.resultados_tabla(int(año1), int(año2), encontramos_name )
+                                    print(datos_resultados)
+                                    return "Generando archivo de clasificación de temporada {0} - {1} ".format(año1, año2)
+
                                 else: 
                                     i =+ len(token.descripcion)
                                     self.agregarError("tk_smay", "Falto signo mayor",i,1)
@@ -539,6 +580,16 @@ class AnalizadorSintactico:
         '''PARTIDOS equipo TEMPORADA <YYYY-YYYY> [ -f archivo ] [ -ji número ]
             [ -jf número ]'''
         #? se espera reservada -- TK_tab
+        equipo = None
+        año1 = None
+        año2 = None
+        global nombre
+        nombre = None
+        global banji
+        banji = None
+        global banjf
+        banjf = None
+
         token = self.sacarToken()
         if token.tipo == "TK_part":
             token = self.sacarToken()
@@ -550,6 +601,7 @@ class AnalizadorSintactico:
                 self.agregarError("tk_cadena", "sin datos",i,1)
                 return
             elif token.tipo == "tk_cadena":
+                equipo = token.descripcion
                 i =+ len(token.descripcion)
                 token = self.sacarToken()
                 
@@ -579,6 +631,7 @@ class AnalizadorSintactico:
 
                             return
                         elif token.tipo == "tk_año":
+                            año1 = token.descripcion
                             i =+ len(token.descripcion)
                             token = self.sacarToken()    
 
@@ -597,6 +650,7 @@ class AnalizadorSintactico:
                                     self.agregarError("tk_año", "sin datos",i,1)
                                     return
                                 elif token.tipo == "tk_año":
+                                    año2 = token.descripcion
                                     i =+ len(token.descripcion)
                                     token = self.sacarToken()    
                                     
@@ -632,6 +686,10 @@ class AnalizadorSintactico:
                                         else:
                                             i =+ len(token.descripcion)
                                             print("asignación: ", encontramos_final)
+                                        datos_resultados = self.csv.resultado_equipo(equipo, int(año1), int(año2), encontramos_name   , encontramos_inicio, encontramos_final)
+                                        print(datos_resultados)
+                                        return "Generando archivo de resultados de temporada {0} - {1} del {2}".format(año1, año2, equipo)
+                                        
                                     else: 
                                         i =+ len(token.descripcion)
                                         self.agregarError("tk_smay", "Falto signo mayor >", i, 1)
@@ -681,8 +739,9 @@ class AnalizadorSintactico:
                     
                 elif token.tipo == "tk_num":
                     i =+ len(token.descripcion)
+                    banji = token.descripcion
                     print("todo bien", token.descripcion)
-                    return token.descripcion
+                    return banji
                 else: 
                     i =+ len(token.descripcion)
                     self.agregarError("tkb1", "Se esperaba -ji", i, 1)
@@ -714,8 +773,9 @@ class AnalizadorSintactico:
                     
                 elif token.tipo == "tk_num":
                     i =+ len(token.descripcion)
+                    banjf = token.descripcion
                     print("todo bien", token.descripcion)
-                    return token.descripcion
+                    return banjf
                 else: 
                     i =+ len(token.descripcion)
                     self.agregarError("tkb2", "Se esperaba -j2", i, 1)
@@ -725,6 +785,12 @@ class AnalizadorSintactico:
     def TOP(self):
         '''TOP condición TEMPORADA <YYYY-YYYY> [ -n número ]'''
         #? se espera reservada -- TK_gol
+        global nombre_condicion2
+        nombre_condicion2 = None
+        año1 = None
+        año2 = None
+        global bann
+        bann = None
         token = self.sacarToken()
         if token.tipo == "TK_top":
             i =+ len(token.descripcion)
@@ -763,6 +829,7 @@ class AnalizadorSintactico:
 
                             return
                         elif token.tipo == "tk_año":
+                            año1 = token.descripcion
                             i =+ len(token.descripcion)
                             token = self.sacarToken()    
 
@@ -781,6 +848,7 @@ class AnalizadorSintactico:
                                     self.agregarError("tk_año", "sin datos",i,1)
                                     return
                                 elif token.tipo == "tk_año":
+                                    año2 = token.descripcion
                                     i =+ len(token.descripcion)
                                     token = self.sacarToken()    
                                     
@@ -800,6 +868,10 @@ class AnalizadorSintactico:
                                         else:
                                             i =+ len(token.descripcion)
                                             print("asignación: ", encontramos_name)
+                                        datos_resultados = self.csv.resultado_top(nombre_condicion2, int(año1), int(año2), int(encontramos_name))                                           
+                                        print(datos_resultados)
+                                        return "El top superior de la temporada {0} - {1} fue: ".format(año1 , año2)
+
                                     else: 
                                         i =+ len(token.descripcion)
                                         self.agregarError("tk_smay", "Falto signo mayor",i,1)
@@ -843,11 +915,13 @@ class AnalizadorSintactico:
                 if token is None:
                     i =+ len(token.descripcion)
                     self.agregarError("tk_num", "sin datos", i,1)
+
                     
                 elif token.tipo == "tk_num":
+                    bann = token.descripcion
                     i =+ len(token.descripcion)
                     print("todo bien", token.descripcion)
-                    return token.descripcion
+                    return bann
                 else: 
                     i =+ len(token.descripcion)
                     self.agregarError("tkb3", "Se esperaba -n", i, 1)
@@ -867,19 +941,22 @@ class AnalizadorSintactico:
                 self.agregarError("None", "Se esperaba SUPERIOR, INFERIOR", i,1 )
                 return
             elif token.tipo == "TK_inf" or token.tipo == "TK_sup":
+                nombre_condicion2 = token.descripcion
                 i =+ len(token.descripcion)
                 print("La condicion: ", token.descripcion)
-                return token.descripcion
+                return nombre_condicion2
             else:
                 i =+ len(token.descripcion)
                 self.agregarError("condicion", "Se esperaba SUPERIOR | INFERIOR ", i,1)
     def ADIOS(self):
         '''ADIOS'''
+        adios = None
         #? se espera reservada -- TK_tab
         token = self.sacarToken()
         if token.tipo == "TK_adios":
-            token = self.sacarToken()
             i =+ len(token.descripcion)
+            return "ADIOS"
+            
         else: 
             i =+ len(token.descripcion)
             self.agregarError("TK_adios", "Falto ADIOS",i,1) 
@@ -891,3 +968,56 @@ class AnalizadorSintactico:
         for error_ in self.errores:
             x.add_row([error_])
         print(x)
+
+    # def imprimirErrores(self):
+    #     '''Imprime una tabla con los errores'''
+    #     x = PrettyTable()
+    #     x.field_names = ["Lexema","linea","columna", "tipo"]
+    #     if len(self.errores) > 0:
+    #         for error_ in self.errores:
+    #             x.add_row([error_.entrada, error_.pila, error_.columna, error_.fila])     
+    #         print(x)
+    #     else: 
+    #         messagebox.showinfo("Advertencia", "Te falta la información")
+        
+    #     self.Tabla_tokens(x.get_html_string(),"errores")
+        
+    #     return x.get_html_string()
+
+    
+    # def guardar(self, name: str, cadena: str, abrir: bool = True ):  #? es una libreria por defecto, sirve para manejo de rutas
+    #     ruta = os.path.dirname(os.path.abspath(__file__))+"\\archivos"
+    #     apertura= open("{}\\{}".format(ruta, name), encoding = "utf-8", mode = "w" )
+    #     apertura.write(cadena)
+    #     apertura.close()
+    #     if abrir:
+    #         os.system('start {}\\"{}"'.format(ruta, name))#? format = es para incrustar valores desde codigo a cadena
+    # def busqueda(self, codigo):
+    #     self.Tabla_tokens(codigo)
+
+    # def Tabla_tokens(self, cadena, nombre_tab):
+    #     print("su reporte se esta cargando")
+    #     print(" cargando.....")
+    #     print(" cargando ......")
+    #     print("gracias por preferirnos")
+    #     # repo = open("Tabla.html", "w")
+    #     estilo = '''<!DOCTYPE html>
+    #     <html lang="en">
+    #         <head>
+    #             <title>Entrada {1}</title>
+    #             <meta charset="utf-8">
+    #         <meta name="viewport" content="width=device-width, initial-scale=1">
+    #         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    #         <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+    #         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    #         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+    #         </head>
+    #     <body>
+    #     <div class="container">
+    #     <h2>Tabla {1}</h2>  
+    #      <table class="table">
+    #         <thead class="thead-dark">
+    #          {0}
+    #     </table>'''.format(cadena, nombre_tab)  #? 1: nombre_tab, 0: cadena
+    #     self.guardar("{0}.html".format(nombre_tab), estilo, True)#? colocamos falso para abrir después
+    
