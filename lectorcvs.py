@@ -15,11 +15,48 @@ class ImportarCSV:
 
     def resultados_jornada(self, numero: int, año1: int, año2: int, nombre: str):
         datos = pd.DataFrame(self.datos, columns = ['Temporada', 'Jornada', 'Equipo1', 'Equipo2', 'Goles1', 'Goles2'])
+        a1 =  datos.loc[(datos['Temporada'] == '{0}-{1}'.format(año1, año2)) & (datos['Jornada'] == numero)].values
+        salida = open(nombre, 'w')
         #!================================================================
+        html = '''<p>Tabla de JORNADA</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <table style="border-collapse: collapse; width: 100%;" border="1">
+                <tbody>
+                <tr>
+                <td style="width: 14.2857%;">Temporada</td>
+                <td style="width: 14.2857%;">Jornada</td>
+                <td style="width: 14.2857%;">Equipo 1</td>
+                <td style="width: 14.2857%;">Equipo 2</td>
+                <td style="width: 14.2857%;">Goles 1</td>
+                <td style="width: 14.2857%;">Goles 2</td>
+                </tr>
+                                </tbody>
+                </table>
+                '''
+        entradas = ""
+        for i in range (len(a1)): 
+        
+            entradas +='''
+                <table style="border-collapse: collapse; width: 100%;" border="1">
+                <tbody>
+                <tr>
+                <td style="width: 20%;"> {}</td>
+                <td style="width: 20%;"> {}</td>
+                <td style="width: 20%;"> {}</td>
+                <td style="width: 20%;"> {}</td>
+                <td style="width: 20%;"> {}</td>
+                </tr>
+                </tbody>
+                </table>'''.format(i [0], i[1], i[2],  i[3],i[4], i[5], i[6])
+        
 
+        suma = html + entradas
+        s
         #!==============================================================
-        return datos.loc[(datos['Temporada'] == '{0}-{1}'.format(año1, año2)) & (datos['Jornada'] == numero)].values
-
+        
     def resultados_goles(self, condicion: str, equipo: str, año1: int, año2: int):
         datos = pd.DataFrame(self.datos, columns = ['Temporada', 'Equipo1', 'Equipo2', 'Goles1', 'Goles2'])
         
