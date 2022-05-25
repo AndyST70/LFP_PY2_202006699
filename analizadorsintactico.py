@@ -213,7 +213,7 @@ class AnalizadorSintactico:
                     self.agregarError("tk_id", "sin datos", i,1)
                     
                 elif token.tipo == "tk_id": 
-                    nombre = token.descripcion
+                    nombre = token.descripcion + ".html"
                     i =+ len(token.descripcion)
                     print("todo bien", token.descripcion)
                     return nombre
@@ -316,7 +316,7 @@ class AnalizadorSintactico:
                                             i =+ len(token.descripcion)
                                             print("asignación: ", encontramos_name)
                                         datos_resultados = self.csv.resultados_jornada(int(numero), int(año1), int(año2), encontramos_name)                                           
-                                        print(datos_resultados)
+                                       
                                         return "Generando archivo de resultados jornada {0} temporada {1} - {2}".format(int(numero), año1, año2)
 
                                     else: 
@@ -547,12 +547,13 @@ class AnalizadorSintactico:
                                     encontramos_name = self.INS()
                                     if encontramos_name is None:
                                         i =+ len(token.descripcion)
+                                        encontramos_name = "temporada.html"
                                         print("Se agrega por defecto: temporada.html")
                                     else:
                                         i =+ len(token.descripcion)
                                         print("asignación: ", encontramos_name)    
                                     datos_resultados = self.csv.resultados_tabla(int(año1), int(año2), encontramos_name )
-                                    print(datos_resultados)
+                                    
                                     return "Generando archivo de clasificación de temporada {0} - {1} ".format(año1, año2)
 
                                 else: 
@@ -666,6 +667,7 @@ class AnalizadorSintactico:
                                         encontramos_name = self.INS()
                                         if encontramos_name is None:
                                             i =+ len(token.descripcion)
+                                            encontramos_name = "partidos.html"
                                             print("Se agrega por defecto: partidos.html")
                                         else:
                                             i =+ len(token.descripcion)
@@ -687,7 +689,6 @@ class AnalizadorSintactico:
                                             i =+ len(token.descripcion)
                                             print("asignación: ", encontramos_final)
                                         datos_resultados = self.csv.resultado_equipo(equipo, int(año1), int(año2), encontramos_name   , encontramos_inicio, encontramos_final)
-                                        print(datos_resultados)
                                         return "Generando archivo de resultados de temporada {0} - {1} del {2}".format(año1, año2, equipo)
                                         
                                     else: 
@@ -863,14 +864,20 @@ class AnalizadorSintactico:
                                         #? se espera -f
                                         encontramos_name = self.INS3()
                                         if encontramos_name is None:
+                                            encontramos_name = "5"
                                             i =+ len(token.descripcion)
                                             print("Se agrega por defecto: 5 equipos ")
                                         else:
                                             i =+ len(token.descripcion)
                                             print("asignación: ", encontramos_name)
                                         datos_resultados = self.csv.resultado_top(nombre_condicion2, int(año1), int(año2), int(encontramos_name))                                           
-                                        print(datos_resultados)
-                                        return "El top superior de la temporada {0} - {1} fue: ".format(año1 , año2)
+                                        a = "El top superior de la temporada {0} - {1} fue: ".format(año1 , año2) + "\n"
+                                        conteo = len(datos_resultados)
+                                        for i in range(len (datos_resultados)):
+                                            a += " {} Equipo {} puntos:{}".format(conteo, datos_resultados[i][0], datos_resultados [i][1]) + "\n"
+                                            conteo -= 1
+                                        return  a
+                                        
 
                                     else: 
                                         i =+ len(token.descripcion)

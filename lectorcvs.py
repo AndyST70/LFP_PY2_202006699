@@ -1,12 +1,13 @@
 import pandas as pd
 from pandas import DataFrame
+import webbrowser
 
 class ImportarCSV:
     ruta: str = None
     datos: DataFrame = None
     def __init__(self, ruta: str):
         self.ruta = ruta
-        self.datos = pd.read_csv(self.ruta, header = [0], encoding='utf8')
+        self.datos = pd.read_csv(self.ruta, header = [0], encoding='utf-8')
         
     def resultado_partido(self, e1: str, e2: str, año: int, año1: int):
         datos = pd.DataFrame(self.datos, columns = ['Temporada', 'Equipo1', 'Equipo2', 'Goles1', 'Goles2'])
@@ -16,6 +17,7 @@ class ImportarCSV:
     def resultados_jornada(self, numero: int, año1: int, año2: int, nombre: str):
         datos = pd.DataFrame(self.datos, columns = ['Temporada', 'Jornada', 'Equipo1', 'Equipo2', 'Goles1', 'Goles2'])
         a1 =  datos.loc[(datos['Temporada'] == '{0}-{1}'.format(año1, año2)) & (datos['Jornada'] == numero)].values
+        print(a1)
         salida = open(nombre, 'w')
         #!================================================================
         html = '''<p>Tabla de JORNADA</p>
@@ -37,24 +39,30 @@ class ImportarCSV:
                 </table>
                 '''
         entradas = ""
-        for i in range (len(a1)): 
+        for i in range (len(a1)) : 
         
             entradas +='''
                 <table style="border-collapse: collapse; width: 100%;" border="1">
                 <tbody>
                 <tr>
-                <td style="width: 20%;"> {}</td>
-                <td style="width: 20%;"> {}</td>
-                <td style="width: 20%;"> {}</td>
-                <td style="width: 20%;"> {}</td>
-                <td style="width: 20%;"> {}</td>
+                <td style="width: 14.2857%;"> {}</td>
+                <td style="width: 14.2857%;"> {}</td>
+                <td style="width: 14.2857%;"> {}</td>
+                <td style="width: 14.2857%;"> {}</td>
+                <td style="width: 14.2857%;"> {}</td>
+                <td style="width: 14.2857%;"> {}</td>
                 </tr>
                 </tbody>
-                </table>'''.format(i [0], i[1], i[2],  i[3],i[4], i[5], i[6])
-        
-
+                </table>'''.format(a1[i][0], a1[i][1], a1[i][2], a1[i][3], a1[i][4],a1[i][5])
+                
         suma = html + entradas
-        s
+
+
+        salida.write(suma)
+        salida.close()
+
+        webbrowser.open_new_tab(nombre)
+        
         #!==============================================================
         
     def resultados_goles(self, condicion: str, equipo: str, año1: int, año2: int):
@@ -71,7 +79,7 @@ class ImportarCSV:
             return local + visita
     
       
-    def resultados_tabla(self, año1: int, año2: int, bandera__f: str = None ):
+    def resultados_tabla(self, año1: int, año2: int, bandera__f: str):
         datos = pd.DataFrame(self.datos, columns=["Temporada", "Equipo1", "Equipo2", "Goles1", "Goles2"])
         d1 = datos.loc[(datos["Temporada"] == "{0}-{1}".format(año1, año2))].values
 
@@ -107,18 +115,109 @@ class ImportarCSV:
         def ordenar(elemento):
             return elemento[1]
         
-        lista_puntajes.sort(key=ordenar)
+        lista_puntajes.sort(key=ordenar) #? . sort ordena la lista
+        
+
+        #? lista_puntajes guardado de elementos
+        salida = open(bandera__f, 'w')
+        #!================================================================
+        html = '''<p>Tabla de TABLA</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <table style="border-collapse: collapse; width: 100%;" border="1">
+                <tbody>
+                <tr>
+                <td style="width: 14.2857%;">Equipo</td>
+                <td style="width: 14.2857%;">Puntos por Temporada</td>
+                </tr>
+                                </tbody>
+                </table>
+                '''
+        entradas = ""
+        for i in range (len(lista_puntajes)) : 
+        
+            entradas +='''
+                <table style="border-collapse: collapse; width: 100%;" border="1">
+                <tbody>
+                <tr>
+                <td style="width: 14.2857%;"> {}</td>
+                <td style="width: 14.2857%;"> {}</td>
+                </tr>
+                </tbody>
+                </table>'''.format(lista_puntajes[i][0], lista_puntajes[i][1])
+                
+        suma = html + entradas
+
+
+        salida.write(suma)
+        salida.close()
+
+        webbrowser.open_new_tab(bandera__f)
+        
+        #!==============================================================
+
+
+
 
         return lista_puntajes
-    def resultado_equipo(self, equipo: str, año1: int, año2: int, bandera__f: str = None,   bandera_ji: str = None, bandera_jf: str = None):
+    def resultado_equipo(self, equipo: str, año1: int, año2: int, bandera__f: str = None,   band_ji: str = None, band_jf: str = None):
+        #? ingresamos nuestros archivos 
+        entrada = pd.DataFrame(self.datos, columns=["Temporada", "Jornada", "Equipo1", "Equipo2", "Goles1", "Goles2"])
+        d1 = entrada.loc[(entrada["Temporada"] == "{0}-{1}".format(año1, año2))].loc[(entrada["Equipo1"] == equipo) | (entrada["Equipo2"] == equipo)].values
+        #! definimos que si vienen los datos siguientes se procede
+        if band_ji != None and band_jf != None:
+            #! ge : >= y le <= 
+            d1 = entrada.loc[(entrada["Jornada"].ge(int(band_ji))) & (entrada["Jornada"].le(int(band_jf)))].values
+        print(d1) #? .values es un arreglo
+         #? lista_puntajes guardado de elementos
+        salida = open(bandera__f, 'w')
+        #!================================================================
+        html = '''<p>Tabla de TABLA</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <p>&nbsp;</p>
+                <table style="border-collapse: collapse; width: 100%;" border="1">
+                <tbody>
+                <tr>
+                <td style="width: 14.2857%;">Temporada</td>
+                <td style="width: 14.2857%;">Jornada</td>
+                <td style="width: 14.2857%;">Equipo 1</td>
+                <td style="width: 14.2857%;">Equipo 2</td>
+                <td style="width: 14.2857%;">Goles 1</td>
+                <td style="width: 14.2857%;">Goles 2</td>
+                </tr>
+                                </tbody>
+                </table>
+                '''
+        entradas = ""
+        for i in range (len(d1)) : 
         
-        datos = pd.DataFrame(self.datos, columns=["Temporada", "Jornada", "Equipo1", "Equipo2", "Goles1", "Goles2"])
-        datos = datos.loc[(datos["Temporada"] == "{0}-{1}".format(año1, año2))].loc[(datos["Equipo1"] == equipo) | (datos["Equipo2"] == equipo)]
+            entradas +='''
+                <table style="border-collapse: collapse; width: 100%;" border="1">
+                <tbody>
+                <tr>
+                <td style="width: 14.2857%;"> {}</td>
+                <td style="width: 14.2857%;"> {}</td>
+                <td style="width: 14.2857%;"> {}</td>
+                <td style="width: 14.2857%;"> {}</td>
+                <td style="width: 14.2857%;"> {}</td>
+                <td style="width: 14.2857%;"> {}</td>
+                </tr>
+                </tbody>
+                </table>'''.format(d1[i][0], d1[i][1], d1[i][2], d1[i][3], d1[i][4], d1[i][5] )
+                
+        suma = html + entradas
 
-        if bandera_ji != None and bandera_jf != None:
-            datos = datos.loc[(datos["Jornada"] >= int(bandera_ji)) & (datos["Jornada"] <= int(bandera_jf))]
-        
-        return datos.values
+
+        salida.write(suma)
+        salida.close()
+
+        webbrowser.open_new_tab(bandera__f)
+        #!==============================================================
+        return d1
     def resultado_top(self, condicion: str, año1: int, año2: int, bandera_n: int = 5):
         
         d1 = pd.DataFrame(self.datos, columns=["Temporada", "Equipo1", "Equipo2", "Goles1", "Goles2"])
@@ -156,4 +255,4 @@ class ImportarCSV:
                 lista_puntajes = lista_puntajes[inicio:]
                 return lista_puntajes[::-1]
             else:
-                return lista_puntajes[:int(bandera_n)]
+                return lista_puntajes[:int(bandera_n)] #? segun el número de equipos manda la cantidad según la bandera
